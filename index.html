@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu de Peur</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #333;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            color: red;
+            text-shadow: 2px 2px 5px black;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="gameCanvas"></canvas>
+<div class="game-over" id="gameOverText" style="display:none;">GAME OVER</div>
+
+<script>
+    // Setup du canvas
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Variables du jeu
+    let player = { x: canvas.width / 2, y: canvas.height - 50, size: 50, speed: 5 };
+    let monster = { x: Math.random() * canvas.width, y: -50, size: 50, speed: 3 };
+    let gameOver = false;
+
+    // Son d'alarme effrayant
+    const alarmSound = new Audio('https://www.soundjay.com/button/beep-07.wav');
+    alarmSound.loop = true;
+
+    // Fonction de mise à jour du jeu
+    function updateGame() {
+        if (gameOver) return;
+
+        // Effacer l'écran
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Déplacer le joueur
+        if (leftPressed && player.x > 0) player.x -= player.speed;
+        if (rightPressed && player.x < canvas.width - player.size) player.x += player.speed;
+        if (upPressed && player.y > 0) player.y -= player.speed;
+        if (downPressed && player.y < canvas.height - player.size) player.y += player.speed;
+
+        // Déplacer le monstre
+        monster.y += monster.speed;
+
+        // Si le monstre atteint le bas de l'écran, réapparaît en haut
+        if (monster.y > canvas.height) {
+            monster.y = -50;
+            monster.x = Math.random() * canvas.width;
+        }
+
+        // Vérifier la collision entre le joueur et le monstre
+        if (checkCollision(player, monster)) {
+            gameOver = true;
+            alarmSound.play();  // Démarrer l'alarme effrayante
+            document.getElementById('gameOverText').style.display = 'block';
+        }
+
+        // Dessiner le joueur et le monstre
+        ctx.fillStyle = '#FF0000';
+        ctx.fillRect(player.x, player.y, player.size, player.size); // Joueur
+
+        ctx.fillStyle = '#00FF00';
+        ctx.fillRect(monster.x, monster.y, monster.size, monster.size); // Monstre
+
+        // Demander à l'ordinateur de redessiner la scène
+        if (!gameOver) {
+            requestAnimationFrame(updateGame);
+        }
+    }
+
+    // Vérifier les collisions
+    function checkColli
