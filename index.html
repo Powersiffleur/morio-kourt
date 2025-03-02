@@ -25,16 +25,17 @@
             color: red;
             text-shadow: 2px 2px 5px black;
             z-index: 10;
+            display: none;
         }
     </style>
 </head>
 <body>
 
 <canvas id="gameCanvas"></canvas>
-<div class="game-over" id="gameOverText" style="display:none;">GAME OVER</div>
+<div class="game-over" id="gameOverText">GAME OVER</div>
 
 <script>
-    // Setup du canvas
+    // Récupérer l'élément canvas et initialiser le contexte de dessin
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
@@ -49,14 +50,14 @@
     const alarmSound = new Audio('https://www.soundjay.com/button/beep-07.wav');
     alarmSound.loop = true;
 
-    // Fonction de mise à jour du jeu
+    // Fonction pour mettre à jour les éléments du jeu
     function updateGame() {
         if (gameOver) return;
 
-        // Effacer l'écran
+        // Effacer l'écran à chaque frame
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Déplacer le joueur
+        // Déplacer le joueur selon les touches directionnelles
         if (leftPressed && player.x > 0) player.x -= player.speed;
         if (rightPressed && player.x < canvas.width - player.size) player.x += player.speed;
         if (upPressed && player.y > 0) player.y -= player.speed;
@@ -75,15 +76,15 @@
         if (checkCollision(player, monster)) {
             gameOver = true;
             alarmSound.play();  // Démarrer l'alarme effrayante
-            document.getElementById('gameOverText').style.display = 'block';
+            document.getElementById('gameOverText').style.display = 'block'; // Afficher "Game Over"
         }
 
         // Dessiner le joueur et le monstre
-        ctx.fillStyle = '#FF0000';
-        ctx.fillRect(player.x, player.y, player.size, player.size); // Joueur
+        ctx.fillStyle = '#FF0000'; // Couleur du joueur (rouge)
+        ctx.fillRect(player.x, player.y, player.size, player.size); // Dessiner le joueur
 
-        ctx.fillStyle = '#00FF00';
-        ctx.fillRect(monster.x, monster.y, monster.size, monster.size); // Monstre
+        ctx.fillStyle = '#00FF00'; // Couleur du monstre (vert)
+        ctx.fillRect(monster.x, monster.y, monster.size, monster.size); // Dessiner le monstre
 
         // Demander à l'ordinateur de redessiner la scène
         if (!gameOver) {
@@ -91,5 +92,8 @@
         }
     }
 
-    // Vérifier les collisions
-    function checkColli
+    // Vérifier les collisions entre le joueur et le monstre
+    function checkCollision(player, monster) {
+        return !(player.x + player.size < monster.x || 
+                 player.x > monster.x + monster.size || 
+                 player.y + play
